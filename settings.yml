@@ -1,0 +1,29 @@
+# ── Bible Tagger — per-site settings ────────────────────────────────────
+# Wraps Blue Letter Bible's ScriptTagger: scripture references in text
+# become tooltip links. v0.2 makes it work OUTSIDE cooked posts too —
+# any route matched below is watched for dynamically loaded content
+# (Scripture Campaign scenes and reveals, Trivia explanations, …).
+
+bible_tagger_translation:
+  description: "Translation the tooltips and links use (BLB code: CSB, ESV, KJV, NASB20, NIV, NKJV, NLT, …)."
+  type: string
+  default: "CSB"
+
+bible_tagger_new_window:
+  description: "Open tagged references in a new tab."
+  type: bool
+  default: true
+
+bible_tagger_links:
+  description: "Which references get hyperlinked: all (tag even refs already inside links) or none (tooltip only)."
+  type: enum
+  default: "all"
+  choices:
+    - "all"
+    - "none"
+
+bible_tagger_dynamic_routes:
+  description: "Path prefixes where content loads dynamically (no cooked posts) and should still be tagged — the component watches these pages and re-tags as content arrives. One prefix per row."
+  type: list
+  list_type: compact
+  default: "/scripture-campaign|/trivia"
