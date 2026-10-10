@@ -63,9 +63,30 @@ this job cannot auto-merge.
 Only genuine ambiguity. If you can determine the right answer from the repo, determine
 it and state it rather than asking.
 
+## Scale the spec to the risk
+
+Judge this FIRST, before writing anything.
+
+**Small job** — touches only CSS, comments, metadata, or a setting description;
+no behaviour change, no data, no permissions. Write a SHORT spec: Feature, Files
+to change, Baseline, three to five acceptance criteria, and only the live checks
+that genuinely matter. Skip sections that would be empty. Under 60 lines.
+
+**Substantive job** — touches behaviour, state, data, permissions, routes, or an
+external dependency. Use the full section set below.
+
+A long spec for a small change buries the criteria that matter and costs more to
+produce than the change itself. Thirteen acceptance criteria for a five-line edit
+is a failure, not thoroughness.
+
+## Write the spec with the Write tool
+
+Never write spec.md through a shell heredoc. Long content fails through PowerShell
+and you will loop retrying it.
+
 ## Rules
 
-- Under 400 lines. If it runs longer, the feature is too big for one job — say so and
+- Under 400 lines, and far under that for a small job. If it runs longer, the feature is too big for one job — say so and
   propose how to split it.
 - State findings only with the confidence the evidence supports.
 - Finish with one short message: the spec path, the risk flags, and whether you hit
