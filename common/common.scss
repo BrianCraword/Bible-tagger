@@ -39,20 +39,21 @@ a.BLBST_a {
 // dark_theme setting (auto follows Discourse's active colour scheme).
 // BLB's own CSS is light-only, so these rules do the whole job.
 html.blb-dark {
+  // Colours come from the member's active Discourse colour scheme.
   #blbTagger.bubble {
-    background: #1f1b2e;
-    color: #ece9f5;
-    border-color: #3a3350;
+    background: var(--secondary);
+    color: var(--primary-very-high);
+    border-color: var(--primary-low);
 
     a {
-      color: #c9a7f0;
+      color: var(--tertiary);
     }
 
     // BLB renders the reference heading and the "Powered by" credit as
     // plain children; keep both legible without touching their markup.
     b,
     strong {
-      color: #ffffff;
+      color: var(--primary);
     }
   }
 }

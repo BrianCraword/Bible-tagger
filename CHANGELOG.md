@@ -1,6 +1,11 @@
 # Changelog
 
 ## [Unreleased]
+- The dark-mode popup (`html.blb-dark #blbTagger.bubble`) now takes its
+  background, text, border, link, and bold heading/credit colours from the
+  active Discourse colour scheme instead of a fixed purple palette. As a
+  result, `dark_theme: always` on a light scheme now shows that light
+  scheme's own colours rather than the old fixed dark palette.
 
 ## 2.0.0 — 2026-10-10
 - **Breaking: every setting key was renamed from its 0.2.0 name.** The
