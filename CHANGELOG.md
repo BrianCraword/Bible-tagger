@@ -10,7 +10,9 @@
   component now waits until BLB actually tags a test reference before
   scanning, and a failed walk is retried, at most 3 times per element.
 - `dark_theme: always` restores the forced fixed dark palette, so the popup
-  stays dark on a light colour scheme.
+  stays dark on a light colour scheme. In both dark modes the popup's
+  links, verse numbers, reference heading and BLB logo now stay legible
+  instead of keeping BLB's own light-mode colours.
 
 ## 2.0.0 — 2026-10-10
 - **Breaking: every setting key was renamed from its 0.2.0 name.** The

@@ -40,7 +40,10 @@ a.BLBST_a {
 // BLB's own CSS is light-only, so these rules do the whole job.
 html.blb-dark {
   // Colours come from the member's active Discourse colour scheme.
-  #blbTagger.bubble {
+  // The doubled ID is DELIBERATE: BLB's remote BLBTagger.css uses
+  // ID-qualified rules (e.g. under #bubBody) that outrank a single-ID
+  // selector. Doubling the ID wins on specificity, with no important flag.
+  #blbTagger#blbTagger.bubble {
     background: var(--secondary);
     color: var(--primary-very-high);
     border-color: var(--primary-low);
@@ -49,11 +52,22 @@ html.blb-dark {
       color: var(--tertiary);
     }
 
-    // BLB renders the reference heading and the "Powered by" credit as
-    // plain children; keep both legible without touching their markup.
+    // BLB renders the reference heading as `.bubHead h6` and the
+    // "Powered by" credit as `a.blb-cta` holding an SVG wordmark
+    // (`.blb-type`); keep them and the verse numbers (`.vRef`) legible
+    // without touching their markup.
     b,
-    strong {
+    strong,
+    h6 {
       color: var(--primary);
+    }
+
+    .vRef {
+      color: var(--primary-medium);
+    }
+
+    .blb-type {
+      fill: var(--primary);
     }
   }
 }
@@ -62,8 +76,9 @@ html.blb-dark {
 // variable conversion: `always` must stay dark on a light scheme, where
 // the scheme variables above would resolve to light colours. This is the
 // fixed v2.0.0 palette; the extra class makes it win regardless of order.
+// The ID is doubled for the same reason as the block above.
 html.blb-dark.blb-dark-forced {
-  #blbTagger.bubble {
+  #blbTagger#blbTagger.bubble {
     background: #1f1b2e;
     color: #ece9f5;
     border-color: #3a3350;
@@ -73,8 +88,17 @@ html.blb-dark.blb-dark-forced {
     }
 
     b,
-    strong {
+    strong,
+    h6 {
       color: #ffffff;
+    }
+
+    .vRef {
+      color: #c9c3dc;
+    }
+
+    .blb-type {
+      fill: #ffffff;
     }
   }
 }
