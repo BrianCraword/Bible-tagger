@@ -3,3 +3,5 @@
 # The committed record is .factory/log/.
 .factory/jobs/
 .claude/settings.local.json
+# Builder worktrees are transient checkouts, never part of the repo.
+.claude/worktrees/

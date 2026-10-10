@@ -11,3 +11,4 @@ feature-specific detail here.
   def/end balance plus static review.
 - Minimum-necessary change from the last confirmed-working baseline. Never rewrite a
   block when a targeted change will do.
+- [checks.ps1 blocked in worktree](checks-ps1-blocked-in-worktree.md) — powershell is refused; replicate the checks by hand

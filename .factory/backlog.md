@@ -10,7 +10,7 @@ exercise a different reviewer each time. Real work starts at item 4.
 
 ## Prove the loop
 
-- [ ] Replace the hardcoded dark-mode hex values in common.scss (#1f1b2e, #ece9f5, #3a3350, #c9a7f0, #ffffff) with Discourse colour variables so the popup follows the active scheme instead of one fixed palette
+- [x] Replace the hardcoded dark-mode hex values in common.scss (#1f1b2e, #ece9f5, #3a3350, #c9a7f0, #ffffff) with Discourse colour variables so the popup follows the active scheme instead of one fixed palette
 - [ ] Fill in about.json: theme_version 2.0.0, authors, about_url, and the minimum_discourse_version implied by apiInitializer("1.8.0"); add a .discourse-compatibility file
 - [ ] Make `translation` an enum of the versions BLB actually serves, so a typo can no longer silently fall back to NKJV the way the setting description warns about
 
