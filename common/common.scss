@@ -43,12 +43,15 @@ html.blb-dark {
   // The doubled ID is DELIBERATE: BLB's remote BLBTagger.css uses
   // ID-qualified rules (e.g. under #bubBody) that outrank a single-ID
   // selector. Doubling the ID wins on specificity, with no important flag.
+  // The verse link sits under BLB's #bubBody, whose own rule outranks even
+  // the doubled ID, so it is named explicitly.
   #blbTagger#blbTagger.bubble {
     background: var(--secondary);
     color: var(--primary-very-high);
     border-color: var(--primary-low);
 
-    a {
+    a,
+    #bubBody a {
       color: var(--tertiary);
     }
 
@@ -83,7 +86,8 @@ html.blb-dark.blb-dark-forced {
     color: #ece9f5;
     border-color: #3a3350;
 
-    a {
+    a,
+    #bubBody a {
       color: #c9a7f0;
     }
 
