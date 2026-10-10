@@ -1,0 +1,65 @@
+// ── Bible Tagger 2.0.0 — popup presentation ──────────────────────────
+//
+// BLB serves its own stylesheet for #blbTagger from blueletterbible.org.
+// Everything here layers on top of it and fixes two things their CSS
+// cannot know about: this site's stacking order, and dark mode (their
+// script has no DarkTheme option at all — see the initializer).
+
+// BLB's popup computes to `z-index: auto`, so it loses to VC chrome.
+// Known stacking on this site:
+//   .je-mnav (Header Mega Nav bottom bar) ... 1220
+//   .vc-feed-lightbox ....................... 1240
+// The popup has to clear both or it renders behind the nav on mobile.
+#blbTagger.bubble {
+  z-index: 1250;
+
+  // BLB sizes for desktop prose width. Keep long passages on-screen on a
+  // phone rather than overflowing the viewport.
+  max-width: min(92vw, 420px);
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+}
+
+// Tagged references. BLB marks every anchor it creates with .BLBST_a.
+// Inherit the site's link colour instead of BLB's hard-coded blue so
+// references sit naturally inside a post body.
+a.BLBST_a {
+  color: var(--tertiary);
+  text-decoration-color: var(--tertiary-medium, var(--tertiary));
+  text-underline-offset: 2px;
+
+  &:hover {
+    color: var(--tertiary-hover, var(--tertiary));
+  }
+}
+
+// ── Dark mode ─────────────────────────────────────────────────────────
+//
+// The initializer sets .blb-dark / .blb-light on <html> from the
+// dark_theme setting (auto follows Discourse's active colour scheme).
+// BLB's own CSS is light-only, so these rules do the whole job.
+html.blb-dark {
+  #blbTagger.bubble {
+    background: #1f1b2e;
+    color: #ece9f5;
+    border-color: #3a3350;
+
+    a {
+      color: #c9a7f0;
+    }
+
+    // BLB renders the reference heading and the "Powered by" credit as
+    // plain children; keep both legible without touching their markup.
+    b,
+    strong {
+      color: #ffffff;
+    }
+  }
+}
+
+// The suppression guard the initializer puts on <body> is behavioural
+// only — it must never affect layout. Declared here so its purpose is
+// discoverable from the stylesheet too.
+body.blb-no-scan {
+  // intentionally empty
+}

@@ -1,29 +1,142 @@
-# ── Bible Tagger — per-site settings ────────────────────────────────────
-# Wraps Blue Letter Bible's ScriptTagger: scripture references in text
-# become tooltip links. v0.2 makes it work OUTSIDE cooked posts too —
-# any route matched below is watched for dynamically loaded content
-# (Scripture Campaign scenes and reveals, Trivia explanations, …).
+# ── Bible Tagger — per-site settings ───────────────────────────────────
+#
+# Everything here is stored in THIS site's database (theme_settings), so a
+# component update ships new DEFAULTS and SCHEMA only — a site that has
+# edited a setting keeps its value through every update.
+#
+# SCHEMA DISCIPLINE: evolve additively. Never rename a key or remove one —
+# stored per-site values are keyed to them. 2.0.0 adds two keys and
+# changes no existing one.
+#
+# The option names and values below are Blue Letter Bible's own, passed
+# through to window.BLB.Tagger. See
+# https://www.blueletterbible.org/webtools/BLB_ScriptTagger.cfm
 
-bible_tagger_translation:
-  description: "Translation the tooltips and links use (BLB code: CSB, ESV, KJV, NASB20, NIV, NKJV, NLT, …)."
-  type: string
-  default: "CSB"
-
-bible_tagger_new_window:
-  description: "Open tagged references in a new tab."
-  type: bool
+# NB the key is `tagger_enabled`, not `enabled`. A theme setting literally
+# named `enabled` sits alongside the theme record's OWN `enabled` flag in
+# Discourse's admin payload, and 1.0.0 shipped installed with the setting
+# reading false despite defaulting to true. Renamed so the two can never be
+# confused again. If you are upgrading from 1.0.0, the old `enabled` value
+# is orphaned and ignored.
+#
+# CHECK THIS FIRST. A stored `false` survives every component update, and
+# a switched-off tagger looks exactly like a broken one. On 2026-08-30 this
+# site was found storing false.
+tagger_enabled:
   default: true
+  description: >-
+    Master switch. Off = the component does nothing at all: no script load,
+    no scanning, no tagging. It still logs one line to the console saying
+    it is off, so this state can never again be mistaken for a failure.
 
-bible_tagger_links:
-  description: "Which references get hyperlinked: all (tag even refs already inside links) or none (tooltip only)."
-  type: enum
+translation:
+  default: "CSB"
+  description: >-
+    Bible version shown in the hover popup and used for the links into
+    blueletterbible.org. BLB's own default is NKJV. Use BLB's abbreviations
+    (CSB, NKJV, KJV, NASB, ESV, NIV, NLT...). If a version you enter is not
+    one BLB serves, their script quietly falls back to its default — so if
+    popups suddenly show the wrong translation, check this value first.
+
+hyperlinks:
   default: "all"
+  type: enum
   choices:
-    - "all"
-    - "none"
+    - all
+    - none
+    - hover
+  description: >-
+    Which references become links. 'all' tags every reference including
+    ones a member already linked; 'none' shows the popup on hover but adds
+    no links; 'hover' links only the references it tags itself.
 
-bible_tagger_dynamic_routes:
-  description: "Path prefixes where content loads dynamically (no cooked posts) and should still be tagged — the component watches these pages and re-tags as content arrives. One prefix per row."
-  type: list
-  list_type: compact
-  default: "/scripture-campaign|/trivia"
+target_new_window:
+  default: true
+  description: >-
+    Open blueletterbible.org in a new tab when a member clicks a tagged
+    reference. Recommended on — it keeps members from losing their place in
+    a thread or in the Feed.
+
+hide_translation_abbrev:
+  default: false
+  description: >-
+    Hide the translation abbreviation BLB appends to tagged references in
+    the post text (e.g. the trailing "CSB"). Purely cosmetic. NOTE: this
+    setting did nothing before 2.0.0 — BLB's script reads a misspelled
+    property name internally, and the component was writing the correctly
+    spelled one. 2.0.0 writes both, so this now takes effect.
+
+verse_style:
+  default: "par"
+  type: enum
+  choices:
+    - par
+    - line
+  description: >-
+    Verse layout inside the popup. 'par' runs verses together as a
+    paragraph; 'line' puts each verse on its own line. 'line' reads better
+    for long passages, 'par' for single verses.
+
+dark_theme:
+  default: "auto"
+  type: enum
+  choices:
+    - auto
+    - always
+    - never
+  description: >-
+    Popup colour scheme. 'auto' follows the member's active Discourse
+    colour scheme and re-themes on the fly if they switch without
+    reloading. NOTE: this setting did nothing before 2.0.0 — BLB's script
+    has no dark-theme option whatsoever. 2.0.0 implements it in this
+    component's own stylesheet, so it now takes effect.
+
+no_search_tag_names:
+  default: "code,pre,textarea"
+  description: >-
+    HTML tags BLB should never scan, comma-separated. Keeps code samples
+    and the composer from having verse references rewritten under the
+    member's cursor. Leave blank to let BLB scan everything.
+
+no_search_class_names:
+  default: "mention,hashtag,onebox,d-editor-preview,vc-feed-composer"
+  description: >-
+    CSS class names BLB should never scan, comma-separated. A blocklist
+    applied inside the regions named by scan_selectors below. The
+    component always appends its own internal guard class to whatever you
+    put here, so you cannot switch that protection off by accident.
+
+scan_selectors:
+  default: ".cooked, .chat-message-text, .sc-library-card__premise"
+  description: >-
+    NEW IN 2.0.0, AND THE MOST IMPORTANT SETTING HERE. A comma-separated
+    CSS selector list naming the ONLY regions the tagger may rewrite. This
+    is an allowlist, and it exists to prevent render corruption. BLB's
+    pageInit() walks the entire document body; on this site that includes
+    the Ember/Glimmer-rendered navigation, the Feed rails, and AI Space
+    conversation titles (which routinely contain live scripture
+    references). Rewriting a text node Glimmer owns leaves Glimmer holding
+    a reference to a node that no longer exists, which produces the
+    removeChild / nextSibling render failures that cost discourse-vc-feed
+    three releases. Only ever add selectors that wrap member-authored
+    prose. If a surface stops being tagged after an upgrade, add its
+    container selector here rather than widening this to something broad
+    like "#main-outlet".
+
+script_url:
+  default: ""
+  description: >-
+    ADVANCED — leave blank for normal use. Blank means load ScriptTagger
+    from blueletterbible.org, which is what BLB intends and what keeps you
+    on their updates. 2.0.0 no longer needs a self-hosted copy to satisfy
+    Content-Security-Policy: it unpacks BLB's eval-packed script at
+    runtime without ever calling eval. Set this only if you must pin a
+    specific copy for some other reason.
+
+debug_logging:
+  default: false
+  description: >-
+    NEW IN 2.0.0. Log what the tagger is doing to the browser console —
+    whether the script arrived packed, when it became ready, and how many
+    elements each scan tagged. Off by default. Turn on when diagnosing a
+    surface that is not being tagged, then turn it back off.
