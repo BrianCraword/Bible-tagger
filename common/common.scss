@@ -58,6 +58,27 @@ html.blb-dark {
   }
 }
 
+// dark_theme: always. The hardcoded hex below is DELIBERATE, not a missed
+// variable conversion: `always` must stay dark on a light scheme, where
+// the scheme variables above would resolve to light colours. This is the
+// fixed v2.0.0 palette; the extra class makes it win regardless of order.
+html.blb-dark.blb-dark-forced {
+  #blbTagger.bubble {
+    background: #1f1b2e;
+    color: #ece9f5;
+    border-color: #3a3350;
+
+    a {
+      color: #c9a7f0;
+    }
+
+    b,
+    strong {
+      color: #ffffff;
+    }
+  }
+}
+
 // The suppression guard the initializer puts on <body> is behavioural
 // only — it must never affect layout. Declared here so its purpose is
 // discoverable from the stylesheet too.

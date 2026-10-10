@@ -3,9 +3,14 @@
 ## [Unreleased]
 - The dark-mode popup (`html.blb-dark #blbTagger.bubble`) now takes its
   background, text, border, link, and bold heading/credit colours from the
-  active Discourse colour scheme instead of a fixed purple palette. As a
-  result, `dark_theme: always` on a light scheme now shows that light
-  scheme's own colours rather than the old fixed dark palette.
+  active Discourse colour scheme instead of a fixed purple palette. This
+  applies to `dark_theme: auto`; `always` keeps the fixed dark palette (see
+  below).
+- Fixed: after a cold-cache page load, references are tagged again. The
+  component now waits until BLB actually tags a test reference before
+  scanning, and a failed walk is retried, at most 3 times per element.
+- `dark_theme: always` restores the forced fixed dark palette, so the popup
+  stays dark on a light colour scheme.
 
 ## 2.0.0 — 2026-10-10
 - **Breaking: every setting key was renamed from its 0.2.0 name.** The
