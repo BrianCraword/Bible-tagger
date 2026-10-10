@@ -110,11 +110,21 @@ const LOAD_TIMEOUT_MS = 15000;
 const READY_TIMEOUT_MS = 10000;
 const READY_POLL_MS = 120;
 
+// A walk that throws un-marks its element so a later pass can try again,
+// but each element identity is walked at most MAX_WALK_ATTEMPTS times.
+const MAX_WALK_ATTEMPTS = 3;
+const RETRY_DELAY_MS = 1000;
+
 let bootPromise = null;
 let taggerReady = false;
 let rescanTimer = null;
+let retryTimer = null;
 let observer = null;
 let diagnosed = false;
+
+// Element -> number of failed walkDomTree attempts. Weak, so elements
+// Glimmer tears down are not kept alive by the count.
+const walkAttempts = new WeakMap();
 
 function debug(...args) {
   if (settings.debug_logging) {
@@ -261,7 +271,9 @@ function applyConfig() {
 }
 
 // Dark mode is ours, not BLB's — their script has no DarkTheme option.
-// We flag <html> and the stylesheet does the rest.
+// We flag <html> and the stylesheet does the rest. `always` also adds a
+// forced-dark class, which selects the fixed dark palette so the popup
+// stays dark on a light scheme; `auto` follows the scheme's colours.
 function applyColorScheme() {
   const mode = settings.dark_theme || "auto";
   let dark;
@@ -285,24 +297,46 @@ function applyColorScheme() {
 
   document.documentElement.classList.toggle("blb-dark", dark);
   document.documentElement.classList.toggle("blb-light", !dark);
+  document.documentElement.classList.toggle(
+    "blb-dark-forced",
+    mode === "always"
+  );
 }
 
 // ── Bootstrap ─────────────────────────────────────────────────────────
 
 // pageInit() binds the internal `Dom` alias that walkDomTree needs, but
-// it does so asynchronously (it loads YUI first). Probe a detached,
-// empty node until the call stops throwing.
+// it does so asynchronously (it loads YUI first). That alone is not
+// readiness: refSearch reads BLB.Tagger.bcre/ccre/rqt/rre, which come
+// from loadOut.cfm and arrive asynchronously AFTER pageInit(). Walking an
+// empty node never reaches refSearch, so an empty probe passed while
+// every real walk still threw. Instead, each attempt walks a fresh,
+// detached node holding only a real reference as plain text, and counts
+// as ready only if BLB actually produced an anchor in it. The probe is never
+// inserted into the document (so it cannot be hovered) and is never
+// reused after a failed attempt, since a throw may leave it half-walked.
+// Returns the attempt count when ready, false on timeout.
 async function waitForWalkReady() {
-  const probe = document.createElement("div");
   const deadline = Date.now() + READY_TIMEOUT_MS;
+  let attempts = 0;
 
   while (Date.now() < deadline) {
+    attempts++;
+    const probe = document.createElement("div");
+    probe.textContent = "John 3:16";
+    let ready = false;
     try {
       window.BLB.Tagger.walkDomTree(probe);
-      return true;
+      ready = probe.querySelector("a") !== null;
     } catch {
-      await new Promise((r) => setTimeout(r, READY_POLL_MS));
+      ready = false;
     }
+    if (ready) {
+      // Drop BLB's anchor (and anything attached to it) with the probe.
+      probe.textContent = "";
+      return attempts;
+    }
+    await new Promise((r) => setTimeout(r, READY_POLL_MS));
   }
   return false;
 }
@@ -350,16 +384,18 @@ async function bootstrap() {
     return false;
   }
 
-  if (!(await waitForWalkReady())) {
+  const probeAttempts = await waitForWalkReady();
+  if (!probeAttempts) {
     warnOnce(
-      "ScriptTagger loaded but never became ready to scan (its YUI " +
-        "dependency did not finish loading) — scripture tagging is OFF."
+      "ScriptTagger loaded but never tagged a test reference: BLB's " +
+        "reference data (loadOut.cfm) or its YUI dependency did not " +
+        "finish loading — scripture tagging is OFF."
     );
     return false;
   }
 
   taggerReady = true;
-  debug("ready");
+  debug("ready after", probeAttempts, "probe attempt(s)");
   return true;
 }
 
@@ -396,6 +432,7 @@ function scanNow() {
   applyColorScheme();
 
   let tagged = 0;
+  let retryWanted = false;
   nodes.forEach((el) => {
     if (el.hasAttribute(DONE_ATTR) || !el.isConnected) {
       return;
@@ -406,14 +443,34 @@ function scanNow() {
     el.setAttribute(DONE_ATTR, "1");
     try {
       window.BLB.Tagger.walkDomTree(el);
+      walkAttempts.delete(el);
       tagged++;
     } catch (e) {
       debug("walkDomTree failed on", el, e);
+      // A failed walk must not leave the element marked done forever,
+      // but it must not hot-loop either: un-mark it for a later retry
+      // until it has failed MAX_WALK_ATTEMPTS times, then give up.
+      const count = (walkAttempts.get(el) || 0) + 1;
+      walkAttempts.set(el, count);
+      if (count < MAX_WALK_ATTEMPTS) {
+        el.removeAttribute(DONE_ATTR);
+        retryWanted = true;
+      } else {
+        debug("giving up on", el, "after", count, "failed walk(s)");
+      }
     }
   });
 
   if (tagged) {
     debug("tagged", tagged, "element(s)");
+  }
+
+  // One pending retry at most; like rescanTimer, never reset it.
+  if (retryWanted && !retryTimer) {
+    retryTimer = setTimeout(() => {
+      retryTimer = null;
+      scheduleRescan();
+    }, RETRY_DELAY_MS);
   }
 }
 
