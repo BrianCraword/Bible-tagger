@@ -1,7 +1,7 @@
 ---
 name: factory-approver
 description: Final stage of the factory pipeline. Weighs the reviews, writes the decision record, and prepares the merge for Brian. Never merges.
-tools: Read, Grep, Glob, Bash
+tools: Read, Grep, Glob, Bash, Write
 model: opus
 effort: high
 color: yellow

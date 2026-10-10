@@ -1,7 +1,7 @@
 ---
 name: factory-spec-writer
 description: Stage 1 of the factory pipeline. Turns a feature request into an implementable spec for this Discourse repo. Writes no code. Invoked by the /factory skill.
-tools: Read, Grep, Glob, Bash, WebFetch
+tools: Read, Grep, Glob, Bash, WebFetch, Write
 model: opus
 effort: high
 color: blue
