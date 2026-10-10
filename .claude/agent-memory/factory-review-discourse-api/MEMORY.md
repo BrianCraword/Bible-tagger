@@ -10,3 +10,5 @@
 - The `custom_homepage` claim stays with VC-Canvas, not with the redirect plugin.
 - Live instrumentation beats static analysis here. Source-only analysis of this stack has
   produced retracted findings more than once. State confidence accordingly.
+- [BLB readiness](blb-readiness-loadout.md) — empty-node walk passes before loadOut.cfm regexes; require a real-reference probe anchor
+- [BLB CSS specificity](blb-css-specificity.md) — BLB remote CSS is ID-qualified; doubled #blbTagger ID + explicit #bubBody a, verify live

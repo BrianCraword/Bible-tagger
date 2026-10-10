@@ -9,4 +9,4 @@
 - Network success does not imply script execution. A third-party script downloaded and
   fired `onload` while CSP silently blocked its `eval`, leaving its API undefined.
 - A GitHub PAT was previously exposed from `app.yml` via discourse-doctor to a public
-  URL. No token, PAT or key belongs in source or committed config.
+  URL. No token, PAT or key belongs in source or committed config.- [Bible-tagger BLB two-stage load](project_bible_tagger_blb_two_stage_load.md) — ScriptTagger then loadOut.cfm; verify CSP/execution of both live

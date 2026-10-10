@@ -15,3 +15,8 @@ all refused. Do not try to get around the guard.
 that apply to the changed file types with bash/node (brace balance for .js/.gjs, `ruby -c`
 and the session/status grep for .rb, JSON parse of about.json/package.json). Say in the
 build record that the checks were run by hand, not by the script.
+
+The same guard refuses compound bash commands that mix `git` with other steps, or that run
+`node` on a path held in a shell variable. Run `git diff`/`git commit` as their own commands,
+and give `cp` / `node --check` literal absolute paths in separate calls. Python is not on
+PATH either; use the Edit tool for multi-line text replacements.
