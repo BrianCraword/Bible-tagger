@@ -1,0 +1,5 @@
+# --- software factory ---
+# Working job state is transient and must never dirty the tree at merge time.
+# The committed record is .factory/log/.
+.factory/jobs/
+.claude/settings.local.json
