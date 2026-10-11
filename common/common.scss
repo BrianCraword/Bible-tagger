@@ -4,7 +4,7 @@
 // Everything here layers on top of it and fixes two things their CSS
 // cannot know about: this site's stacking order, and dark mode (their
 // script has no DarkTheme option at all — see the initializer).
-body>#scriptDiv>#blbTagger>.bubHead>div>h6
+body>#scriptDiv>#blbTagger>.bubHead>div>
  {
     background-color: #bf1e2e;
     color: var(--st-header-text);
@@ -16,7 +16,7 @@ body>#scriptDiv>#blbTagger>.bubHead>div>h6
     line-height: 1em;
     text-align: center;
 }
-}
+
 // BLB's popup computes to `z-index: auto`, so it loses to VC chrome.
 // Known stacking on this site:
 //   .je-mnav (Header Mega Nav bottom bar) ... 1220
