@@ -2,3 +2,4 @@
 # Leftover job files from the retired factory pipeline; safe to delete by hand.
 .factory/
 .claude/worktrees/
+.playwright-mcp/
