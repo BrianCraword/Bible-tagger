@@ -3,6 +3,7 @@ name: factory-review-discourse-api
 description: Factory reviewer. Checks a feature branch for Discourse API conformance — Glimmer/GJS, deprecated APIs, plugin outlets, initializers, theme/plugin boundaries.
 tools: Read, Grep, Glob, Bash
 model: opus
+effort: high
 memory: project
 color: purple
 ---

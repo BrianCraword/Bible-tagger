@@ -3,6 +3,7 @@ name: factory-review-backend
 description: Factory reviewer. Checks a feature branch for Rails and Discourse plugin backend safety — migrations, guardians, serializers, queries, jobs, site settings.
 tools: Read, Grep, Glob, Bash
 model: opus
+effort: high
 memory: project
 color: orange
 ---

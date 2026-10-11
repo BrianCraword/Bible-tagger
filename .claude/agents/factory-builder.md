@@ -3,7 +3,7 @@ name: factory-builder
 description: Stage 2 of the factory pipeline. Implements an approved spec on an isolated branch in this Discourse repo. Invoked by the /factory skill.
 tools: Read, Edit, Write, Grep, Glob, Bash
 model: opus
-effort: high
+effort: medium
 memory: project
 isolation: worktree
 color: green

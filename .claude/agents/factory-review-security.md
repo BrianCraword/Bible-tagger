@@ -3,6 +3,7 @@ name: factory-review-security
 description: Factory reviewer. Checks a feature branch for authorization, gating, member-data exposure and CSP problems.
 tools: Read, Grep, Glob, Bash
 model: opus
+effort: high
 memory: project
 color: red
 ---

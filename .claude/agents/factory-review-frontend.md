@@ -2,7 +2,8 @@
 name: factory-review-frontend
 description: Factory reviewer. Checks a feature branch for SCSS, theme variable, responsive, dark-mode and accessibility problems.
 tools: Read, Grep, Glob, Bash
-model: sonnet
+model: opus
+effort: high
 memory: project
 color: cyan
 ---
