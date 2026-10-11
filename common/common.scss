@@ -1,4 +1,4 @@
-// ── Bible Tagger 2.1.0 — popup presentation ──────────────────────────
+// ── Bible Tagger 2.2.0 — popup presentation ──────────────────────────
 //
 // BLB serves its own stylesheet for #blbTagger from blueletterbible.org.
 // Everything here layers on top of it and fixes what their CSS cannot
@@ -10,36 +10,148 @@
 // `#blbTagger#blbTagger` below is DELIBERATE — it wins on specificity
 // with no `!important` anywhere.
 
+@use "sass:color";
+@use "sass:list";
+@use "sass:meta";
+@use "sass:string";
+
+// ── Colour settings (2.2.0) ──────────────────────────────────────────
+//
+// Discourse injects every theme setting ahead of this file as
+//   $setting_name: unquote("value");
+// (Theme#to_scss_variable in core), so each arrives as an unquoted
+// STRING, never a Sass colour, and it is whatever the admin typed. The
+// `!default` lines below only take effect if a setting is missing
+// entirely (e.g. compiling this file outside Discourse); an empty value
+// falls back to the default just like an invalid one does.
+$popup_header_top_colour: "" !default;
+$popup_header_bottom_colour: "" !default;
+$popup_link_colour: "" !default;
+$popup_link_colour_dark: "" !default;
+$reference_link_colour: "" !default;
+$reference_link_colour_dark: "" !default;
+$forced_dark_background: "" !default;
+$forced_dark_credit_background: "" !default;
+$forced_dark_text_colour: "" !default;
+$forced_dark_muted_colour: "" !default;
+$forced_dark_border_colour: "" !default;
+
+$blb-hex-digits: "0123456789abcdef";
+
+// Strips leading and trailing spaces.
+@function blb-trim($s) {
+  @while string.length($s) > 0 and string.slice($s, 1, 1) == " " {
+    $s: string.slice($s, 2);
+  }
+  @while string.length($s) > 0 and string.slice($s, -1) == " " {
+    $s: string.slice($s, 1, -2);
+  }
+  @return $s;
+}
+
+// The guard. Returns the setting as a lower-case "#rgb" or "#rrggbb"
+// string if that is what it holds, and $fallback otherwise — so a typo
+// ("banana", "e0812a", "#12345", blank) can never break the stylesheet
+// or emit junk CSS; that one colour just stays at its default. Nothing
+// but a validated hex string is ever written into the CSS.
+@function blb-hex($value, $fallback) {
+  @if meta.type-of($value) != "string" {
+    @return string.unquote($fallback);
+  }
+
+  $s: string.to-lower-case(blb-trim(string.unquote($value)));
+  $len: string.length($s);
+
+  @if ($len != 4 and $len != 7) or string.slice($s, 1, 1) != "#" {
+    @return string.unquote($fallback);
+  }
+
+  @for $i from 2 through $len {
+    @if not string.index($blb-hex-digits, string.slice($s, $i, $i)) {
+      @return string.unquote($fallback);
+    }
+  }
+
+  @return $s;
+}
+
+// A validated hex string as a real Sass colour, for the rgba() tints.
+@function blb-color($hex) {
+  $h: string.slice($hex, 2);
+
+  @if string.length($h) == 3 {
+    $h: string.slice($h, 1, 1) + string.slice($h, 1, 1) + string.slice($h, 2, 2) +
+      string.slice($h, 2, 2) + string.slice($h, 3, 3) + string.slice($h, 3, 3);
+  }
+
+  $channels: ();
+
+  @for $i from 0 to 3 {
+    $hi: string.index($blb-hex-digits, string.slice($h, $i * 2 + 1, $i * 2 + 1)) - 1;
+    $lo: string.index($blb-hex-digits, string.slice($h, $i * 2 + 2, $i * 2 + 2)) - 1;
+    $channels: list.append($channels, $hi * 16 + $lo);
+  }
+
+  @return rgb(list.nth($channels, 1), list.nth($channels, 2), list.nth($channels, 3));
+}
+
+// Hover colour for post links. At the default base colour this returns
+// the hand-tuned 2.1.0 hover exactly; for a custom base it derives one
+// by mixing toward $toward (black in light mode, white in dark).
+@function blb-hover($hex, $default-hex, $default-hover, $toward, $weight) {
+  @if $hex == $default-hex {
+    @return $default-hover;
+  }
+  @return color.mix($toward, blb-color($hex), $weight);
+}
+
+$blb-header-top: blb-hex($popup_header_top_colour, "#e0812a");
+$blb-header-bottom: blb-hex($popup_header_bottom_colour, "#c1631a");
+$blb-popup-link: blb-hex($popup_link_colour, "#b85f14");
+$blb-popup-link-dark: blb-hex($popup_link_colour_dark, "#f0a85a");
+$blb-ref: blb-hex($reference_link_colour, "#d9741d");
+$blb-ref-dark: blb-hex($reference_link_colour_dark, "#f0973f");
+$blb-forced-surface: blb-hex($forced_dark_background, "#1f1b2e");
+$blb-forced-surface-2: blb-hex($forced_dark_credit_background, "#191528");
+$blb-forced-text: blb-hex($forced_dark_text_colour, "#ece9f5");
+$blb-forced-muted: blb-hex($forced_dark_muted_colour, "#b9b2cc");
+$blb-forced-edge: blb-hex($forced_dark_border_colour, "#3a3350");
+
+$blb-ref-rgb: blb-color($blb-ref);
+$blb-ref-dark-rgb: blb-color($blb-ref-dark);
+$blb-ref-hover: blb-hover($blb-ref, "#d9741d", #b85f14, black, 15%);
+$blb-ref-dark-hover: blb-hover($blb-ref-dark, "#f0973f", #ffb067, white, 25%);
+
 // ── Tagged references in post bodies ─────────────────────────────────
 // BLB marks every anchor it creates with .BLBST_a and hard-codes a blue.
 // The doubled class is DELIBERATE: a single `a.BLBST_a` loses to the
 // site's own post-link colour (verified live: it stayed #08c).
 a.BLBST_a.BLBST_a {
-  color: #d9741d;
+  color: $blb-ref;
   text-decoration: underline;
-  text-decoration-color: rgba(217, 116, 29, 0.45);
+  text-decoration-color: color.change($blb-ref-rgb, $alpha: 0.45);
   text-decoration-thickness: 1px;
   text-underline-offset: 2px;
   border-radius: 3px;
   transition: color 0.12s ease, background-color 0.12s ease;
 
   &:hover {
-    color: #b85f14;
+    color: $blb-ref-hover;
     text-decoration-color: currentColor;
-    background: rgba(217, 116, 29, 0.1);
+    background: color.change($blb-ref-rgb, $alpha: 0.1);
   }
 }
 
 // ── The hover popup ──────────────────────────────────────────────────
 #blbTagger#blbTagger.bubble {
   // Palette. Only these variables change between light and dark.
-  --blb-accent: #e0812a;
-  --blb-accent-dark: #c1631a;
+  --blb-accent: #{$blb-header-top};
+  --blb-accent-dark: #{$blb-header-bottom};
   --blb-surface: #ffffff;
   --blb-surface-2: #faf7f2;
   --blb-text: #1f1b2e;
   --blb-muted: #6b6477;
-  --blb-link: #b85f14;
+  --blb-link: #{$blb-popup-link};
   --blb-edge: #e4ded2;
   --blb-shadow: 0 10px 28px rgba(31, 27, 46, 0.18), 0 2px 6px rgba(31, 27, 46, 0.1);
 
@@ -163,39 +275,40 @@ a.BLBST_a.BLBST_a {
 // are restated here.
 html.blb-dark {
   a.BLBST_a.BLBST_a {
-    color: #f0973f;
-    text-decoration-color: rgba(240, 151, 63, 0.45);
+    color: $blb-ref-dark;
+    text-decoration-color: color.change($blb-ref-dark-rgb, $alpha: 0.45);
 
     &:hover {
-      color: #ffb067;
-      background: rgba(240, 151, 63, 0.14);
+      color: $blb-ref-dark-hover;
+      background: color.change($blb-ref-dark-rgb, $alpha: 0.14);
     }
   }
 
-  // Colours come from the member's active Discourse colour scheme.
+  // Colours come from the member's active Discourse colour scheme. Only
+  // the link colour is a setting here; `auto` deliberately has no palette
+  // settings of its own.
   #blbTagger#blbTagger.bubble {
     --blb-surface: var(--secondary);
     --blb-surface-2: var(--primary-very-low);
     --blb-text: var(--primary-very-high);
     --blb-muted: var(--primary-medium);
-    --blb-link: #f0a85a;
+    --blb-link: #{$blb-popup-link-dark};
     --blb-edge: var(--primary-low);
     --blb-shadow: 0 10px 28px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.2);
   }
 }
 
-// dark_theme: always. The hardcoded hex below is DELIBERATE, not a missed
-// variable conversion: `always` must stay dark on a light scheme, where
-// the scheme variables above would resolve to light colours. This is the
-// fixed v2 palette.
+// dark_theme: always. A fixed palette (the forced_dark_* settings), NOT
+// the scheme variables: `always` must stay dark on a light scheme, where
+// the scheme variables above would resolve to light colours.
 html.blb-dark.blb-dark-forced {
   #blbTagger#blbTagger.bubble {
-    --blb-surface: #1f1b2e;
-    --blb-surface-2: #191528;
-    --blb-text: #ece9f5;
-    --blb-muted: #b9b2cc;
-    --blb-link: #f0a85a;
-    --blb-edge: #3a3350;
+    --blb-surface: #{$blb-forced-surface};
+    --blb-surface-2: #{$blb-forced-surface-2};
+    --blb-text: #{$blb-forced-text};
+    --blb-muted: #{$blb-forced-muted};
+    --blb-link: #{$blb-popup-link-dark};
+    --blb-edge: #{$blb-forced-edge};
   }
 }
 

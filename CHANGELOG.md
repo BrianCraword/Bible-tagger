@@ -1,5 +1,26 @@
 # Changelog
 
+## 2.2.0 — 2026-10-10
+- New: eleven colour settings, so admins can change the popup and
+  reference-link colours without editing code. Each default is exactly the
+  2.1.0 colour, so upgrading changes nothing until one is edited (checked by
+  compiling both versions and diffing the CSS: identical).
+  - `popup_header_top_colour`, `popup_header_bottom_colour` — header bar
+  - `popup_link_colour`, `popup_link_colour_dark` — links inside the popup
+  - `reference_link_colour`, `reference_link_colour_dark` — tagged
+    references in posts
+  - `forced_dark_background`, `forced_dark_credit_background`,
+    `forced_dark_text_colour`, `forced_dark_muted_colour`,
+    `forced_dark_border_colour` — the `dark_theme: always` palette
+- Values must be hex (`#rgb` or `#rrggbb`). An invalid value (a colour name,
+  a missing `#`, a wrong length, blank) is ignored and that colour stays at
+  its default; the stylesheet still compiles.
+- The hover colour of a reference link is now worked out from that link's
+  colour. At the default colours it is unchanged.
+- `dark_theme: auto` still takes its colours from the Discourse colour
+  scheme; only the two dark link colours apply to it.
+- No JavaScript changes. No existing setting changed.
+
 ## 2.1.0 — 2026-10-10
 - Fixed: after a full page load (cold cache), references are tagged again.
   The component now waits until BLB actually tags a test reference before

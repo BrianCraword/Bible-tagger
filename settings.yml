@@ -6,7 +6,8 @@
 #
 # SCHEMA DISCIPLINE: evolve additively. Never rename a key or remove one —
 # stored per-site values are keyed to them. 2.0.0 adds two keys and
-# changes no existing one.
+# changes no existing one. 2.2.0 adds the eleven colour keys at the end
+# of this file and changes no existing one.
 #
 # The option names and values below are Blue Letter Bible's own, passed
 # through to window.BLB.Tagger. See
@@ -140,3 +141,91 @@ debug_logging:
     whether the script arrived packed, when it became ready, and how many
     elements each scan tagged. Off by default. Turn on when diagnosing a
     surface that is not being tagged, then turn it back off.
+
+# ── Colours (NEW IN 2.2.0) ─────────────────────────────────────────────
+#
+# Every default below is exactly the 2.1.0 colour, so installing 2.2.0
+# changes nothing until an admin edits one. Values are hex only: #rgb or
+# #rrggbb. Anything else (a colour name, a missing #, a typo, blank) is
+# ignored and that one colour stays at its default — the stylesheet
+# still compiles. Discourse has no colour-picker setting type and no
+# pattern validation for string settings, so the check lives in
+# common/common.scss.
+#
+# The defaults MUST stay quoted: an unquoted `#` starts a YAML comment,
+# which would turn the default into null.
+#
+# `dark_theme: auto` takes its popup background, text, muted text and
+# border from the member's Discourse colour scheme, so it has no palette
+# settings here; only the link colours below apply to it.
+
+popup_header_top_colour:
+  default: "#e0812a"
+  description: >-
+    Hex colour, e.g. #e0812a. Top of the popup's header bar, which fades
+    from this colour down to the bottom colour below. Used in light and
+    dark mode alike.
+
+popup_header_bottom_colour:
+  default: "#c1631a"
+  description: >-
+    Hex colour, e.g. #c1631a. Bottom of the popup's header bar (see the
+    top colour above). Used in light and dark mode alike.
+
+popup_link_colour:
+  default: "#b85f14"
+  description: >-
+    Hex colour, e.g. #b85f14. Links inside the popup (the passage link
+    and any others) in light mode.
+
+popup_link_colour_dark:
+  default: "#f0a85a"
+  description: >-
+    Hex colour, e.g. #f0a85a. Links inside the popup in dark mode, for
+    both 'auto' on a dark colour scheme and 'always'.
+
+reference_link_colour:
+  default: "#d9741d"
+  description: >-
+    Hex colour, e.g. #d9741d. Tagged scripture references in post text,
+    light mode. The underline and hover tint are made from this colour;
+    the hover text colour is darkened from it automatically (at the
+    default it stays the original #b85f14).
+
+reference_link_colour_dark:
+  default: "#f0973f"
+  description: >-
+    Hex colour, e.g. #f0973f. Tagged scripture references in post text,
+    dark mode. The underline and hover tint are made from this colour;
+    the hover text colour is lightened from it automatically (at the
+    default it stays the original #ffb067).
+
+forced_dark_background:
+  default: "#1f1b2e"
+  description: >-
+    Hex colour, e.g. #1f1b2e. Popup background when dark_theme is
+    'always'. Ignored by 'auto', which uses the colour scheme.
+
+forced_dark_credit_background:
+  default: "#191528"
+  description: >-
+    Hex colour, e.g. #191528. Background of the "Powered by Blue Letter
+    Bible" strip at the foot of the popup when dark_theme is 'always'.
+
+forced_dark_text_colour:
+  default: "#ece9f5"
+  description: >-
+    Hex colour, e.g. #ece9f5. Verse text in the popup when dark_theme is
+    'always'.
+
+forced_dark_muted_colour:
+  default: "#b9b2cc"
+  description: >-
+    Hex colour, e.g. #b9b2cc. Muted text in the popup when dark_theme is
+    'always': verse numbers and the "Powered by" credit.
+
+forced_dark_border_colour:
+  default: "#3a3350"
+  description: >-
+    Hex colour, e.g. #3a3350. The popup's outline and the line above the
+    "Powered by" credit when dark_theme is 'always'.
