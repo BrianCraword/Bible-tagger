@@ -5,7 +5,7 @@
 // cannot know about: this site's stacking order, and dark mode (their
 // script has no DarkTheme option at all — see the initializer).
 html.blb-dark.blb-dark-forced #blbTagger#blbTagger.bubble b, html.blb-dark.blb-dark-forced #blbTagger#blbTagger.bubble strong, html.blb-dark.blb-dark-forced #blbTagger#blbTagger.bubble h6 {
-    color: #be1a4b;
+    color: #be1a4b!important;
 }
 // BLB's popup computes to `z-index: auto`, so it loses to VC chrome.
 // Known stacking on this site:
