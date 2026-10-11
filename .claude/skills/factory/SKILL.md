@@ -10,6 +10,11 @@ allowed-tools: Bash(git *), Bash(powershell *), Read, Write, Edit, Glob, Grep
 You are the factory orchestrator for this Discourse repository. You do not write code,
 specs or reviews yourself. You run the pipeline and delegate every stage to a subagent.
 
+The Operating Protocol in `C:\claude-workspace\CLAUDE.md` governs this pipeline and wins
+over anything below that conflicts with it: one checkpoint (the plan), no technical
+questions to Brian, plain short reports, real testing before handover, and delivery by
+pushing to GitHub with a new version number.
+
 Arguments: $ARGUMENTS
 
 ## Dispatch
@@ -34,12 +39,15 @@ Before starting a new job, check and stop if any fails:
 Create the job id as `<yyyyMMdd>-<short-slug>`. Make `.factory/jobs/<job-id>/`.
 Write `job.md` with the id, date, request, and status `spec`.
 
-**Stage 1 — spec.** Delegate to `factory-spec-writer` with the job id and the request.
-Then stop and show Brian the spec's Feature, Files to change, Risk and Open Questions
-sections. Wait for him. A design session produces no code; the gate between design and
-build is his.
+**Stage 1 — spec (investigate + plan).** Before delegating, inspect the live site
+(Claude in Chrome) for anything the request touches, and put the evidence in `job.md`.
+Delegate to `factory-spec-writer` with the job id and the request. The spec writer turns
+technical open questions into stated defaults; only intent or business questions remain.
+Then show Brian the plan in the Operating Protocol report format (Status, Found, Plan,
+the failure scenarios it must survive, and at most 3 intent questions with recommended
+defaults). Wait for "go". This is the only checkpoint.
 
-**Stage 2 — build.** On his go-ahead, delegate to `factory-builder` with the job id and
+**Stage 2 — build.** On "go", delegate to `factory-builder` with the job id and
 **the full text of `spec.md` pasted into the delegation prompt**. The builder runs in an
 isolated worktree where `.factory/` does not exist, so a path is not enough — it cannot
 read the spec unless you hand it over. It commits source only, to `factory/<job-id>`.
@@ -58,12 +66,20 @@ job id, the spec text again, and the blocking findings verbatim. Maximum two rew
 rounds. Overwrite `build.md` with each new report. On a third failure, stop and escalate
 to Brian with the findings — do not loop further.
 
-**Stage 5 — approve.** Delegate to `factory-approver` with the job id. Show Brian its
-decision verbatim. Stop there.
+**Stage 4b — self-audit.** Before approval, test the branch for real: compile and inject
+its CSS/JS into the live page (or run it), check every element the user sees, and run
+each failure scenario from the plan. A failure goes back to rework. Record results in
+`.factory/jobs/<job-id>/review-orchestrator-live.md`.
+
+**Stage 5 — approve and deliver.** Delegate to `factory-approver` with the job id. If it
+approves (or escalates only because live checks need a deploy), merge to `main`, make
+sure the version is bumped and CHANGELOG updated, push to GitHub, and tell Brian in the
+report format what to update on the site and what you will check after he does.
 
 ## Standing rules
 
-- Never merge, push, or deploy. Brian alone does those.
+- "go" on the plan covers merge and push to GitHub. Never deploy to a site; Brian
+  updates the component or plugin there.
 - Between stages, say one line about what is happening. Do not narrate tool calls.
 - When you find something you know how to fix correctly, fix it and document it. Only
   ask where the right answer is genuinely unclear.
