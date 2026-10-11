@@ -1,7 +1,4 @@
-# --- software factory ---
-# Working job state is transient and must never dirty the tree at merge time.
-# The committed record is .factory/log/.
-.factory/jobs/
 .claude/settings.local.json
-# Builder worktrees are transient checkouts, never part of the repo.
+# Leftover job files from the retired factory pipeline; safe to delete by hand.
+.factory/
 .claude/worktrees/

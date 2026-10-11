@@ -69,4 +69,19 @@ Loads `BLB_ScriptTagger-min.js` from **blueletterbible.org** at runtime — an e
 - **Cooked posts are handled by BLB's own pass**; the route watching exists only for surfaces that render outside the cooked-post pipeline. If a new plugin surface needs tagging, add its path prefix to `bible_tagger_dynamic_routes` — no code change.
 - **The popup is styled by `--blb-*` variables** in `common/common.scss` (header, surface, text, muted, link, edge, shadow). Light mode sets them; dark mode only restates them. With `dark_theme: auto` on a dark scheme they come from the active Discourse colour scheme; `dark_theme: always` uses its own dark palette (the `forced_dark_*` settings), so the popup stays dark even on a light scheme.
 - **Selectors are deliberately strong.** BLB's remote stylesheet uses ID-qualified rules (under `#bubBody`), so popup rules use a doubled `#blbTagger#blbTagger` and name `#bubBody` where needed; post links use a doubled `a.BLBST_a.BLBST_a` to beat the site's link colour. No `!important` anywhere.
+- **How to test it live** is in `CLAUDE.md`.
 - **Readiness is proven by a real tag.** After `pageInit()`, the component walks a detached test node holding a real reference and only starts scanning once BLB actually tags it, because BLB's reference data (`loadOut.cfm`) arrives after `pageInit()`. If that never happens within 10 s, one console warning says tagging is off. A walk that still fails un-marks its element and is retried after 1 s, at most 3 times per element.
+
+## Open items
+
+Not yet done, none urgent. Each needs verifying live before it is changed.
+
+- about.json: add authors, about_url and `minimum_discourse_version`.
+- Make `translation` a dropdown of the versions BLB serves, so a typo can't silently fall back to another version.
+- A failed start is permanent until reload (`ensureBooted` keeps the failed promise). Retry on page change.
+- An edited post is never re-tagged: the element stays marked as done after Discourse re-cooks it.
+- If `#main-outlet` is ever replaced, the observer keeps watching the old node. Check whether Discourse replaces it.
+- The `window.eval` shim can be restored by the timeout while BLB's script is still loading.
+- `scanNow` re-applies config and colour scheme on every scan; once at start is enough.
+- Dark mode `auto`: verse numbers (`--primary-medium`) are low contrast.
+- Ideas: per-member translation choice, category scoping, an exclusion selector list, popup z-index as a setting, setting descriptions in `locales/en.yml` if that is the current convention.
